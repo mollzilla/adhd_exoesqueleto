@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api from '../../api/client';
+import { supabase } from '../../lib/supabaseClient';
 
 export default function AddPatientModal({ onClose, onSuccess }) {
   const [email, setEmail]     = useState('');
@@ -19,7 +19,8 @@ export default function AddPatientModal({ onClose, onSuccess }) {
     setError('');
     setLoading(true);
     try {
-      await api.post('/coach/patients', { email: email.trim() });
+      const res = await supabase.functions.invoke('invite-patient', { body: { email: email.trim() } });
+      if (res?.error) throw new Error('Invite failed');
       onSuccess();
     } catch (err) {
       setError(err.message);

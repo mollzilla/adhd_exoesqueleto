@@ -10,7 +10,8 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const data = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
+    if (!data || !data.user) throw new Error('Invalid credentials');
+    if (data.token) localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
@@ -18,7 +19,8 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(async (email, password, name, role) => {
     const data = await api.post('/auth/register', { email, password, name, role });
-    localStorage.setItem('token', data.token);
+    if (!data || !data.user) throw new Error('Register failed');
+    if (data.token) localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
